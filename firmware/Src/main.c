@@ -49,6 +49,7 @@
 #include "main.h"
 #include "stm32f4xx_hal.h"
 #include "usb_device.h"
+#include "usbd_customhid.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -275,17 +276,18 @@ void check_buttons()
 
             if((state != button_state[controller][button]) && (now > button_last[controller][button] + debounce_millis)) {
                 if(state) {
-                    // printf("%d, %d pressed\n", controller, button);
+                    printf("%d, %d pressed\n", controller, button);
                 } else {
-                    // printf("%d, %d released\n", controller, button);
+                    printf("%d, %d released\n", controller, button);
                 }
-                serial_flush();
                 button_state[controller][button] = state;
                 button_last[controller][button] = now;
             }
         }
     }
 }
+
+const uint64_t send_report_millis = 20;
 
 /* USER CODE END 0 */
 
@@ -326,6 +328,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  uint64_t then = HAL_GetTick();
   while (1)
   {
   /* USER CODE END WHILE */
@@ -333,7 +336,34 @@ int main(void)
   /* USER CODE BEGIN 3 */
 
      check_buttons();
+
+     uint64_t now = HAL_GetTick();
+
+     if(now > then + send_report_millis) {
+         then = now;
+
+         unsigned char report[3];
+
+         report[0] = 0x01;
+
+         report[1] = 
+             (button_state[C1][NORTH] ? 0x10 : 0) |
+             (button_state[C1][EAST] ? 0x20 : 0) |
+             (button_state[C1][SOUTH] ? 0x40 : 0) |
+             (button_state[C1][WEST] ? 0x80 : 0);
+         report[2] = 
+             (button_state[C1][UP] ? 0x10 : 0) |
+             (button_state[C1][CW] ? 0x20 : 0) |
+             (button_state[C1][DOWN] ? 0x40 : 0) | 
+             (button_state[C1][CCW] ? 0x80 : 0);
+
+         printf("%02X %02X %02X\n", report[0], report[1], report[2]);
+
+         USBD_CUSTOM_HID_SendReport( &hUsbDeviceFS, report, 3);
+     }
+
      LED_beat_heart();
+     serial_flush();
 
   }
   /* USER CODE END 3 */
