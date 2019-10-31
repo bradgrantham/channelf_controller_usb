@@ -342,7 +342,7 @@ int main(void)
      if(now > then + send_report_millis) {
          then = now;
 
-         unsigned char report[3];
+         unsigned char report[5];
 
          report[0] = 0x01;
 
@@ -357,9 +357,20 @@ int main(void)
              (button_state[C1][DOWN] ? 0x40 : 0) | 
              (button_state[C1][CCW] ? 0x80 : 0);
 
-         printf("%02X %02X %02X\n", report[0], report[1], report[2]);
+         report[3] = 
+             (button_state[C2][NORTH] ? 0x10 : 0) |
+             (button_state[C2][EAST] ? 0x20 : 0) |
+             (button_state[C2][SOUTH] ? 0x40 : 0) |
+             (button_state[C2][WEST] ? 0x80 : 0);
+         report[4] = 
+             (button_state[C2][UP] ? 0x10 : 0) |
+             (button_state[C2][CW] ? 0x20 : 0) |
+             (button_state[C2][DOWN] ? 0x40 : 0) | 
+             (button_state[C2][CCW] ? 0x80 : 0);
 
-         USBD_CUSTOM_HID_SendReport( &hUsbDeviceFS, report, 3);
+         printf("%02X %02X %02X %02X %02X\n", report[0], report[1], report[2], report[3], report[4]);
+
+         USBD_CUSTOM_HID_SendReport( &hUsbDeviceFS, report, sizeof(report));
      }
 
      LED_beat_heart();
