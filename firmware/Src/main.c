@@ -49,13 +49,14 @@
 #include "main.h"
 #include "stm32f4xx_hal.h"
 #include "usb_device.h"
-#include "usbd_customhid.h"
 
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
+I2C_HandleTypeDef hi2c3;
+
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
@@ -67,6 +68,7 @@ UART_HandleTypeDef huart1;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART1_UART_Init(void);
+static void MX_I2C3_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -318,6 +320,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_USB_DEVICE_Init();
+  MX_I2C3_Init();
 
   /* USER CODE BEGIN 2 */
 
@@ -436,6 +439,26 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
+/* I2C3 init function */
+static void MX_I2C3_Init(void)
+{
+
+  hi2c3.Instance = I2C3;
+  hi2c3.Init.ClockSpeed = 100000;
+  hi2c3.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c3.Init.OwnAddress1 = 0;
+  hi2c3.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c3.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c3.Init.OwnAddress2 = 0;
+  hi2c3.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c3.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c3) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
 /* USART1 init function */
 static void MX_USART1_UART_Init(void)
 {
@@ -446,7 +469,7 @@ static void MX_USART1_UART_Init(void)
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
   huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_RTS_CTS;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE; // XXX RTS_CTS??
   huart1.Init.OverSampling = UART_OVERSAMPLING_16;
   if (HAL_UART_Init(&huart1) != HAL_OK)
   {
@@ -483,20 +506,26 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
+  /*Configure GPIO pins : GAME1_Pin GAME2_Pin GAME3_Pin GAME4_Pin 
+                           RESET_Pin */
+  GPIO_InitStruct.Pin = GAME1_Pin|GAME2_Pin|GAME3_Pin|GAME4_Pin 
+                          |RESET_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
   /*Configure GPIO pins : C1EAST_Pin C1WEST_Pin C1SOUTH_Pin C1NORTH_Pin 
-                           C2CCW_Pin C2CW_Pin C2DOWN_Pin C2UP_Pin 
-                           C1CW_Pin */
+                           C2CCW_Pin C2CW_Pin C2DOWN_Pin C2UP_Pin */
   GPIO_InitStruct.Pin = C1EAST_Pin|C1WEST_Pin|C1SOUTH_Pin|C1NORTH_Pin 
-                          |C2CCW_Pin|C2CW_Pin|C2DOWN_Pin|C2UP_Pin 
-                          |C1CW_Pin;
+                          |C2CCW_Pin|C2CW_Pin|C2DOWN_Pin|C2UP_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : C2NORTH_Pin C2SOUTH_Pin C1CCW_Pin C1DOWN_Pin 
-                           C2EAST_Pin C2WEST_Pin C1UP_Pin */
+                           C2EAST_Pin C2WEST_Pin C1UP_Pin C1CW_Pin */
   GPIO_InitStruct.Pin = C2NORTH_Pin|C2SOUTH_Pin|C1CCW_Pin|C1DOWN_Pin 
-                          |C2EAST_Pin|C2WEST_Pin|C1UP_Pin;
+                          |C2EAST_Pin|C2WEST_Pin|C1UP_Pin|C1CW_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);

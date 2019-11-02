@@ -58,6 +58,14 @@
 
 #define LED_RED_Pin GPIO_PIN_13
 #define LED_RED_GPIO_Port GPIOC
+#define GAME1_Pin GPIO_PIN_0
+#define GAME1_GPIO_Port GPIOC
+#define GAME2_Pin GPIO_PIN_1
+#define GAME2_GPIO_Port GPIOC
+#define GAME3_Pin GPIO_PIN_2
+#define GAME3_GPIO_Port GPIOC
+#define GAME4_Pin GPIO_PIN_3
+#define GAME4_GPIO_Port GPIOC
 #define C1EAST_Pin GPIO_PIN_0
 #define C1EAST_GPIO_Port GPIOA
 #define C1WEST_Pin GPIO_PIN_1
@@ -74,6 +82,8 @@
 #define C2DOWN_GPIO_Port GPIOA
 #define C2UP_Pin GPIO_PIN_7
 #define C2UP_GPIO_Port GPIOA
+#define RESET_Pin GPIO_PIN_4
+#define RESET_GPIO_Port GPIOC
 #define C2NORTH_Pin GPIO_PIN_10
 #define C2NORTH_GPIO_Port GPIOB
 #define C2SOUTH_Pin GPIO_PIN_11
@@ -86,12 +96,12 @@
 #define C2EAST_GPIO_Port GPIOB
 #define C2WEST_Pin GPIO_PIN_15
 #define C2WEST_GPIO_Port GPIOB
-#define C1CW_Pin GPIO_PIN_8
-#define C1CW_GPIO_Port GPIOA
 #define LED_YELLOW_Pin GPIO_PIN_12
 #define LED_YELLOW_GPIO_Port GPIOC
-#define C1UP_Pin GPIO_PIN_9
+#define C1UP_Pin GPIO_PIN_8
 #define C1UP_GPIO_Port GPIOB
+#define C1CW_Pin GPIO_PIN_9
+#define C1CW_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

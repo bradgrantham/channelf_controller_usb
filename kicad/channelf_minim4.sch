@@ -38,9 +38,9 @@ F 3 "~" H 5975 3375 50  0001 C CNN
 $EndComp
 Text GLabel 2950 4200 0    50   Input ~ 0
 C1DOWN
-Text GLabel 2950 3700 0    50   Input ~ 0
+Text GLabel 2950 3800 0    50   Input ~ 0
 C1UP
-Text GLabel 2950 3600 0    50   Input ~ 0
+Text GLabel 2950 3700 0    50   Input ~ 0
 C1CW
 Text GLabel 2950 3300 0    50   Input ~ 0
 C1CCW
@@ -122,7 +122,6 @@ NoConn ~ 2950 2600
 NoConn ~ 2950 3200
 NoConn ~ 2950 3400
 NoConn ~ 2950 3500
-NoConn ~ 2950 3800
 NoConn ~ 2950 3900
 NoConn ~ 2950 4000
 NoConn ~ 2950 4100
@@ -220,4 +219,5 @@ Wire Wire Line
 	1400 2575 1900 2575
 NoConn ~ 4250 2700
 NoConn ~ 4250 2600
+NoConn ~ 2950 3600
 $EndSCHEMATC
