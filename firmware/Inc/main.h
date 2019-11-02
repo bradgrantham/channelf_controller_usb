@@ -82,8 +82,8 @@
 #define C2DOWN_GPIO_Port GPIOA
 #define C2UP_Pin GPIO_PIN_7
 #define C2UP_GPIO_Port GPIOA
-#define RESET_Pin GPIO_PIN_4
-#define RESET_GPIO_Port GPIOC
+#define SYSRESET_Pin GPIO_PIN_4
+#define SYSRESET_GPIO_Port GPIOC
 #define C2NORTH_Pin GPIO_PIN_10
 #define C2NORTH_GPIO_Port GPIOB
 #define C2SOUTH_Pin GPIO_PIN_11

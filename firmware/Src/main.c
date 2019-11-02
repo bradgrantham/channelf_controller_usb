@@ -223,19 +223,33 @@ int _write(int file, char *ptr, int len)
         return len;
 }
 
-const int C1 = 0;
-const int C2 = 1;
-const int NORTH = 0;
-const int SOUTH = 1;
-const int WEST = 2;
-const int EAST = 3;
-const int UP = 4;
-const int DOWN = 5;
-const int CW = 6;
-const int CCW = 7;
+enum {
+    SYSRESET,
+    GAME1,
+    GAME2,
+    GAME3,
+    GAME4,
+    C1_NORTH,
+    C1_SOUTH,
+    C1_WEST,
+    C1_EAST,
+    C1_UP,
+    C1_DOWN,
+    C1_CW,
+    C1_CCW,
+    C2_NORTH,
+    C2_SOUTH,
+    C2_WEST,
+    C2_EAST,
+    C2_UP,
+    C2_DOWN,
+    C2_CW,
+    C2_CCW,
+    BUTTON_MAX
+};
 
-uint8_t button_state[2][8];
-uint64_t button_last[2][8];
+uint8_t button_state[BUTTON_MAX];
+uint64_t button_last[BUTTON_MAX];
 uint64_t debounce_millis = 30;
 
 typedef struct button_info
@@ -244,47 +258,46 @@ typedef struct button_info
     uint16_t pin;
 } button_info;
 
-button_info button_sources[2][8] =
+button_info button_sources[BUTTON_MAX] =
 {
-    {
-        { C1NORTH_GPIO_Port, C1NORTH_Pin },
-        { C1SOUTH_GPIO_Port, C1SOUTH_Pin },
-        { C1WEST_GPIO_Port, C1WEST_Pin },
-        { C1EAST_GPIO_Port, C1EAST_Pin },
-        { C1UP_GPIO_Port, C1UP_Pin },
-        { C1DOWN_GPIO_Port, C1DOWN_Pin },
-        { C1CW_GPIO_Port, C1CW_Pin },
-        { C1CCW_GPIO_Port, C1CCW_Pin },
-    },
-    {
-        { C2NORTH_GPIO_Port, C2NORTH_Pin },
-        { C2SOUTH_GPIO_Port, C2SOUTH_Pin },
-        { C2WEST_GPIO_Port, C2WEST_Pin },
-        { C2EAST_GPIO_Port, C2EAST_Pin },
-        { C2UP_GPIO_Port, C2UP_Pin },
-        { C2DOWN_GPIO_Port, C2DOWN_Pin },
-        { C2CW_GPIO_Port, C2CW_Pin },
-        { C2CCW_GPIO_Port, C2CCW_Pin },
-    },
+    { SYSRESET_GPIO_Port, SYSRESET_Pin },
+    { GAME1_GPIO_Port, GAME1_Pin },
+    { GAME2_GPIO_Port, GAME2_Pin },
+    { GAME3_GPIO_Port, GAME3_Pin },
+    { GAME4_GPIO_Port, GAME4_Pin },
+    { C1NORTH_GPIO_Port, C1NORTH_Pin },
+    { C1SOUTH_GPIO_Port, C1SOUTH_Pin },
+    { C1WEST_GPIO_Port, C1WEST_Pin },
+    { C1EAST_GPIO_Port, C1EAST_Pin },
+    { C1UP_GPIO_Port, C1UP_Pin },
+    { C1DOWN_GPIO_Port, C1DOWN_Pin },
+    { C1CW_GPIO_Port, C1CW_Pin },
+    { C1CCW_GPIO_Port, C1CCW_Pin },
+    { C2NORTH_GPIO_Port, C2NORTH_Pin },
+    { C2SOUTH_GPIO_Port, C2SOUTH_Pin },
+    { C2WEST_GPIO_Port, C2WEST_Pin },
+    { C2EAST_GPIO_Port, C2EAST_Pin },
+    { C2UP_GPIO_Port, C2UP_Pin },
+    { C2DOWN_GPIO_Port, C2DOWN_Pin },
+    { C2CW_GPIO_Port, C2CW_Pin },
+    { C2CCW_GPIO_Port, C2CCW_Pin },
 };
 
 void check_buttons()
 {
     uint64_t now = HAL_GetTick();
 
-    for(int controller = 0; controller < 2; controller++) {
-        for(int button = 0; button < 8; button++) {
-            int state = !HAL_GPIO_ReadPin(button_sources[controller][button].port, button_sources[controller][button].pin);
+    for(int button = 0; button < BUTTON_MAX; button++) {
+        int state = !HAL_GPIO_ReadPin(button_sources[button].port, button_sources[button].pin);
 
-            if((state != button_state[controller][button]) && (now > button_last[controller][button] + debounce_millis)) {
-                if(state) {
-                    printf("%d, %d pressed\n", controller, button);
-                } else {
-                    printf("%d, %d released\n", controller, button);
-                }
-                button_state[controller][button] = state;
-                button_last[controller][button] = now;
+        if((state != button_state[button]) && (now > button_last[button] + debounce_millis)) {
+            if(state) {
+                printf("%d pressed\n", button);
+            } else {
+                printf("%d released\n", button);
             }
+            button_state[button] = state;
+            button_last[button] = now;
         }
     }
 }
@@ -350,26 +363,31 @@ int main(void)
          report[0] = 0x01;
 
          report[1] = 
-             (button_state[C1][NORTH] ? 0x10 : 0) |
-             (button_state[C1][EAST] ? 0x20 : 0) |
-             (button_state[C1][SOUTH] ? 0x40 : 0) |
-             (button_state[C1][WEST] ? 0x80 : 0);
+             (button_state[C1_NORTH] ? 0x10 : 0) |
+             (button_state[C1_EAST] ? 0x20 : 0) |
+             (button_state[C1_SOUTH] ? 0x40 : 0) |
+             (button_state[C1_WEST] ? 0x80 : 0);
          report[2] = 
-             (button_state[C1][UP] ? 0x10 : 0) |
-             (button_state[C1][CW] ? 0x20 : 0) |
-             (button_state[C1][DOWN] ? 0x40 : 0) | 
-             (button_state[C1][CCW] ? 0x80 : 0);
+             (button_state[C1_UP] ? 0x10 : 0) |
+             (button_state[C1_CW] ? 0x20 : 0) |
+             (button_state[C1_DOWN] ? 0x40 : 0) | 
+             (button_state[C1_CCW] ? 0x80 : 0);
 
          report[3] = 
-             (button_state[C2][NORTH] ? 0x10 : 0) |
-             (button_state[C2][EAST] ? 0x20 : 0) |
-             (button_state[C2][SOUTH] ? 0x40 : 0) |
-             (button_state[C2][WEST] ? 0x80 : 0);
+             (button_state[GAME1] ? 0x01 : 0) |
+             (button_state[GAME2] ? 0x02 : 0) |
+             (button_state[GAME3] ? 0x04 : 0) |
+             (button_state[GAME4] ? 0x08 : 0) |
+             (button_state[C2_NORTH] ? 0x10 : 0) |
+             (button_state[C2_EAST] ? 0x20 : 0) |
+             (button_state[C2_SOUTH] ? 0x40 : 0) |
+             (button_state[C2_WEST] ? 0x80 : 0);
          report[4] = 
-             (button_state[C2][UP] ? 0x10 : 0) |
-             (button_state[C2][CW] ? 0x20 : 0) |
-             (button_state[C2][DOWN] ? 0x40 : 0) | 
-             (button_state[C2][CCW] ? 0x80 : 0);
+             (button_state[SYSRESET] ? 0x01 : 0) |
+             (button_state[C2_UP] ? 0x10 : 0) |
+             (button_state[C2_CW] ? 0x20 : 0) |
+             (button_state[C2_DOWN] ? 0x40 : 0) | 
+             (button_state[C2_CCW] ? 0x80 : 0);
 
          printf("%02X %02X %02X %02X %02X\n", report[0], report[1], report[2], report[3], report[4]);
 
@@ -507,9 +525,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : GAME1_Pin GAME2_Pin GAME3_Pin GAME4_Pin 
-                           RESET_Pin */
+                           SYSRESET_Pin */
   GPIO_InitStruct.Pin = GAME1_Pin|GAME2_Pin|GAME3_Pin|GAME4_Pin 
-                          |RESET_Pin;
+                          |SYSRESET_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
